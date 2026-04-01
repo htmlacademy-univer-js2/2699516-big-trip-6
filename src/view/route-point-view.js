@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -21,22 +21,19 @@ function formatDuration(dateFrom, dateTo) {
 }
 
 function createPointTemplate(point, destination, offers) {
-  const dateFrom = new Date(point.date_from);
-  const dateTo = new Date(point.date_to);
-  
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom.toISOString().split('T')[0]}">${formatDate(point.date_from)}</time>
+        <time class="event__date" datetime="${point.date_from.split('T')[0]}">${formatDate(point.date_from)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${point.type} ${destination ? destination.name : ''}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom.toISOString()}">${formatTime(point.date_from)}</time>
+            <time class="event__start-time">${formatTime(point.date_from)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo.toISOString()}">${formatTime(point.date_to)}</time>
+            <time class="event__end-time">${formatTime(point.date_to)}</time>
           </p>
           <p class="event__duration">${formatDuration(point.date_from, point.date_to)}</p>
         </div>
@@ -67,26 +64,23 @@ function createPointTemplate(point, destination, offers) {
   `;
 }
 
-export default class Point {
+export default class Point extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offers = [];
+
   constructor(point, destination, offers) {
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
-    this.element = null;
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.destination, this.offers);
+  get template() {
+    return createPointTemplate(this.#point, this.#destination, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  setRollupClickHandler(callback) {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', callback);
   }
 }
