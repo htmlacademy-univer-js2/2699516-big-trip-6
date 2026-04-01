@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -67,26 +67,23 @@ function createPointTemplate(point, destination, offers) {
   `;
 }
 
-export default class Point {
+export default class Point extends AbstractView {
+
+  #point = null;
+  #destination = null;
+  #offers = [];
+
   constructor(point, destination, offers) {
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
-    this.element = null;
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.destination, this.offers);
+  get template() {
+    return createPointTemplate(this.#point, this.#destination, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
-}
+  setRollupClickHandler(callback) {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', callback);
+}}

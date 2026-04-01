@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function formatDateTime(dateString) {
   if (!dateString) return '';
@@ -12,7 +12,7 @@ function formatDateTime(dateString) {
   }).replace(',', '');
 }
 
-function createFormTemplate(point = null, destination = null, offers = []) {
+function createFormTemplate(point, destination, offers){
   const isNew = !point;
   const pointData = point || {
     type: 'flight',
@@ -137,26 +137,52 @@ function createFormTemplate(point = null, destination = null, offers = []) {
   `;
 }
 
-export default class CreateForm {
-  constructor(point = null, destination = null, offers = []) {
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
-    this.element = null;
+export default class CreateForm extends AbstractView{
+  
+  #point = null;
+  #destination = null;
+  #offers = [];
+  #onSubmit = null;
+  #onRollupClick = null;
+  #onCancelClick = null;
+
+  constructor(point = null, destination = null, offers = [], onSubmit, onRollupClick,onCancelClick) {
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#onSubmit = onSubmit;
+    this.#onRollupClick = onRollupClick;
+    this.#onCancelClick = onCancelClick;
   }
 
-  getTemplate() {
-    return createFormTemplate(this.point, this.destination, this.offers);
+  get template() {
+    return createFormTemplate(this.#point, this.#destination, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  setHandlers() {
+    const formElement = this.element.querySelector('form');
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+
+    if (formElement) {
+      formElement.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        this.#onSubmit();
+      });
     }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+    
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', () => {
+        this.#onRollupClick();
+      });
+    }
+    
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        this.#onCancelClick();
+      });
+    }
+}
 }
