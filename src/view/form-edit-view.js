@@ -1,7 +1,9 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function formatDateTime(dateString) {
-  if (!dateString) return '';
+  if (!dateString) {
+    return '';
+  }
   const date = new Date(dateString);
   return date.toLocaleString('en-GB', {
     day: '2-digit',
@@ -12,17 +14,17 @@ function formatDateTime(dateString) {
   }).replace(',', '');
 }
 
-function createFormTemplate(point = null, destination = null, offers = []) {
+function createFormTemplate(point, destination, offers){
   const isNew = !point;
   const pointData = point || {
     type: 'flight',
-    base_price: 0,
-    date_from: '',
-    date_to: '',
-    is_favorite: false,
+    basePrice: 0,
+    dateFrom: '',
+    dateTo: '',
+    isFavorite: false,
     offers: []
   };
-  
+
   return `
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -89,11 +91,11 @@ function createFormTemplate(point = null, destination = null, offers = []) {
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time" id="event-start-time-1" type="text" 
-                 name="event-start-time" value="${formatDateTime(pointData.date_from)}">
+                 name="event-start-time" value="${formatDateTime(pointData.dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
           <input class="event__input  event__input--time" id="event-end-time-1" type="text" 
-                 name="event-end-time" value="${formatDateTime(pointData.date_to)}">
+                 name="event-end-time" value="${formatDateTime(pointData.dateTo)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -102,7 +104,7 @@ function createFormTemplate(point = null, destination = null, offers = []) {
             &euro;
           </label>
           <input class="event__input  event__input--price" id="event-price-1" type="text" 
-                 name="event-price" value="${pointData.base_price}">
+                 name="event-price" value="${pointData.basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">${isNew ? 'Save' : 'Save'}</button>
@@ -115,7 +117,7 @@ function createFormTemplate(point = null, destination = null, offers = []) {
         <section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
           <div class="event__available-offers">
-            ${offers.map(offer => `
+            ${offers.map((offer) => `
               <div class="event__offer-selector">
                 <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" 
                        name="event-offer-${offer.id}" ${pointData.offers?.includes(offer.id) ? 'checked' : ''}>
@@ -137,26 +139,52 @@ function createFormTemplate(point = null, destination = null, offers = []) {
   `;
 }
 
-export default class CreateForm {
-  constructor(point = null, destination = null, offers = []) {
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
-    this.element = null;
+export default class CreateForm extends AbstractView{
+
+  #point = null;
+  #destination = null;
+  #offers = [];
+  #onSubmit = null;
+  #onRollupClick = null;
+  #onCancelClick = null;
+
+  constructor(point = null, destination = null, offers = [], onSubmit, onRollupClick,onCancelClick) {
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#onSubmit = onSubmit;
+    this.#onRollupClick = onRollupClick;
+    this.#onCancelClick = onCancelClick;
   }
 
-  getTemplate() {
-    return createFormTemplate(this.point, this.destination, this.offers);
+  get template() {
+    return createFormTemplate(this.#point, this.#destination, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  setHandlers() {
+    const formElement = this.element.querySelector('form');
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+
+    if (formElement) {
+      formElement.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        this.#onSubmit();
+      });
     }
-    return this.element;
-  }
 
-  removeElement() {
-    this.element = null;
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', () => {
+        this.#onRollupClick();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        this.#onCancelClick();
+      });
+    }
   }
 }
