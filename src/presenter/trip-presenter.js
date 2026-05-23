@@ -50,7 +50,6 @@ export default class TripPresenter {
 
     const tripEventsComponent = new TripEvents();
     render(tripEventsComponent, tripEventsSection);
-
     const eventsList = tripEventsSection.querySelector('.trip-events__list');
     if (!eventsList) {
       return;
