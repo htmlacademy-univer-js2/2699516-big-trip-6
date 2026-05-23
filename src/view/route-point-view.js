@@ -21,24 +21,24 @@ function formatDuration(dateFrom, dateTo) {
 }
 
 function createPointTemplate(point, destination, offers) {
-  const dateFrom = new Date(point.date_from);
-  const dateTo = new Date(point.date_to);
+  const dateFrom = new Date(point.dateFrom);
+  const dateTo = new Date(point.dateTo);
 
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom.toISOString().split('T')[0]}">${formatDate(point.date_from)}</time>
+        <time class="event__date" datetime="${dateFrom.toISOString().split('T')[0]}">${formatDate(point.dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${point.type} ${destination ? destination.name : ''}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom.toISOString()}">${formatTime(point.date_from)}</time>
+            <time class="event__start-time" datetime="${dateFrom.toISOString()}">${formatTime(point.dateFrom)}</time>
             &mdash;
             <time class="event__end-time" datetime="${dateTo.toISOString()}">${formatTime(point.date_to)}</time>
           </p>
-          <p class="event__duration">${formatDuration(point.date_from, point.date_to)}</p>
+          <p class="event__duration">${formatDuration(point.dateFrom, point.date_to)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${point.base_price}</span>

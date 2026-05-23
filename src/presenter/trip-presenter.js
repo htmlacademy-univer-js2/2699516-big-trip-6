@@ -36,19 +36,22 @@ export default class TripPresenter {
       }
     }
 
-    render(new Filter(filters), tripControls, RenderPosition.BEFOREEND);
-    render(new Sort(sorts), tripControls, RenderPosition.BEFOREEND);
-
-
+    const filtersContainer = document.querySelector('.trip-controls__filters');
+    const tripEventsSection = this.#container.querySelector('.trip-events');
+    
+    render(new Filter(filters), filtersContainer);
+    
     if (points.length === 0) {
-      render(new EmptyPointsView(), this.#container, RenderPosition.BEFOREEND);
+      render(new EmptyPointsView(), tripEventsSection);
       return;
     }
-
+    
+    render(new Sort(sorts), tripEventsSection);
+    
     const tripEventsComponent = new TripEvents();
-    render(tripEventsComponent, this.#container, RenderPosition.BEFOREEND);
-
-    const eventsList = document.querySelector('.trip-events__list');
+    render(tripEventsComponent, tripEventsSection);
+    
+    const eventsList = tripEventsSection.querySelector('.trip-events__list');
     if (!eventsList) {
       return;
     }
