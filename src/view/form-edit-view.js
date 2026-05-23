@@ -108,7 +108,7 @@ function createFormTemplate(point, destination, offers){
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">${isNew ? 'Save' : 'Save'}</button>
-        <button class="event__reset-btn" type="reset">${isNew ? 'Cancel' : 'Delete'}</button>
+        <button class="event__reset-btn" type="reset">Cancel</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -145,46 +145,47 @@ export default class CreateForm extends AbstractView{
   #destination = null;
   #offers = [];
   #onSubmit = null;
-  #onRollupClick = null;
   #onCancelClick = null;
 
-  constructor(point = null, destination = null, offers = [], onSubmit, onRollupClick,onCancelClick) {
+  constructor({point, destination, offers, onFormSubmit, onCancelClick}) {
     super();
     this.#point = point;
     this.#destination = destination;
     this.#offers = offers;
-    this.#onSubmit = onSubmit;
-    this.#onRollupClick = onRollupClick;
+    this.#onSubmit = onFormSubmit;
     this.#onCancelClick = onCancelClick;
+
+    this.setHandlers();
   }
 
   get template() {
     return createFormTemplate(this.#point, this.#destination, this.#offers);
   }
+  
 
   setHandlers() {
     const formElement = this.element.querySelector('form');
-    const rollupBtn = this.element.querySelector('.event__rollup-btn');
     const resetBtn = this.element.querySelector('.event__reset-btn');
-
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+  
     if (formElement) {
       formElement.addEventListener('submit', (evt) => {
         evt.preventDefault();
-        this.#onSubmit();
+        this.#onSubmit();  // <-- Теперь #onSubmit определен
       });
     }
-
-    if (rollupBtn) {
-      rollupBtn.addEventListener('click', () => {
-        this.#onRollupClick();
-      });
-    }
-
+  
     if (resetBtn) {
       resetBtn.addEventListener('click', (evt) => {
         evt.preventDefault();
         this.#onCancelClick();
       });
     }
-  }
-}
+  
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        this.#onCancelClick();
+      });
+    }
+  }}

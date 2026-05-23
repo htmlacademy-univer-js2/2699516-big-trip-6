@@ -35,4 +35,14 @@ export default class PointModel{
     }
     return offersType.offers.filter((item) => itemsId?.includes(item.id));
   }
+  updatePoint(updatedPoint) {
+    const index = this.#point.findIndex((point) => point.id === updatedPoint.id);
+    
+    if (index === -1) {
+      return false;
+    }
+    
+    this.#point[index] = { ...this.#point[index], ...updatedPoint };
+    return true;
+  }
 }

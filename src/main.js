@@ -11,4 +11,5 @@ const presenter = new TripPresenter({
   pointsModel: pointsModel
 });
 
+
 presenter.init();
