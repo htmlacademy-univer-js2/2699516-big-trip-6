@@ -3,8 +3,12 @@ import Point from '../view/route-point-view.js';
 import CreateForm from '../view/form-edit-view.js';
 import TripEvents from '../view/trip-events-view.js';
 import Filter from '../view/filters-view.js';
+import Sort from '../view/sort-view.js';
+import EmptyPointsView from '../view/empty-points-view.js';
 
 import { render, RenderPosition } from '../framework/render.js';
+import { filters } from '../mock/filter.js';
+import { sorts } from '../mock/sort.js';
 
 export default class TripPresenter {
 
@@ -32,12 +36,21 @@ export default class TripPresenter {
       }
     }
 
-    render(new Filter(), tripControls, RenderPosition.BEFOREEND);
+    const filtersContainer = document.querySelector('.trip-controls__filters');
+    const tripEventsSection = this.#container.querySelector('.trip-events');
+
+    render(new Filter(filters), filtersContainer);
+
+    if (points.length === 0) {
+      render(new EmptyPointsView(), tripEventsSection);
+      return;
+    }
+
+    render(new Sort(sorts), tripEventsSection);
 
     const tripEventsComponent = new TripEvents();
-    render(tripEventsComponent, this.#container, RenderPosition.BEFOREEND);
-
-    const eventsList = document.querySelector('.trip-events__list');
+    render(tripEventsComponent, tripEventsSection);
+    const eventsList = tripEventsSection.querySelector('.trip-events__list');
     if (!eventsList) {
       return;
     }
