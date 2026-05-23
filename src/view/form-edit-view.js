@@ -19,7 +19,7 @@ function createFormTemplate(point, destination, offers){
   const pointData = point || {
     type: 'flight',
     basePrice: 0,
-    dateRrom: '',
+    dateFrom: '',
     dateTo: '',
     isFavorite: false,
     offers: []
