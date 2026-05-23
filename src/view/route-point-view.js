@@ -36,9 +36,9 @@ function createPointTemplate(point, destination, offers) {
           <p class="event__time">
             <time class="event__start-time" datetime="${dateFrom.toISOString()}">${formatTime(point.dateFrom)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo.toISOString()}">${formatTime(point.date_to)}</time>
+            <time class="event__end-time" datetime="${dateTo.toISOString()}">${formatTime(point.dateTo)}</time>
           </p>
-          <p class="event__duration">${formatDuration(point.dateFrom, point.date_to)}</p>
+          <p class="event__duration">${formatDuration(point.dateFrom, point.dateTo)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${point.base_price}</span>
