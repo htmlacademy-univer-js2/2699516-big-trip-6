@@ -38,19 +38,19 @@ export default class TripPresenter {
 
     const filtersContainer = document.querySelector('.trip-controls__filters');
     const tripEventsSection = this.#container.querySelector('.trip-events');
-    
+
     render(new Filter(filters), filtersContainer);
-    
+
     if (points.length === 0) {
       render(new EmptyPointsView(), tripEventsSection);
       return;
     }
-    
+
     render(new Sort(sorts), tripEventsSection);
-    
+
     const tripEventsComponent = new TripEvents();
     render(tripEventsComponent, tripEventsSection);
-    
+
     const eventsList = tripEventsSection.querySelector('.trip-events__list');
     if (!eventsList) {
       return;
