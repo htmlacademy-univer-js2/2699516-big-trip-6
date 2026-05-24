@@ -113,11 +113,15 @@ export default class TripPresenter {
   };
 
   #handleSortModelChange = () => {
-    this.#renderBoard();
+    this.#renderPoints();
   };
 
   #handleSortChange = (sortType) => {
-    this.#sortModel.setSortType(UpdateType.MAJOR, sortType);
+    if (this.#sortModel.getSortType() === sortType) {
+      return;
+    }
+
+    this.#sortModel.setSortType(UpdateType.MINOR, sortType);
   };
 
   #handleNewEventButtonClick = () => {
@@ -213,6 +217,20 @@ export default class TripPresenter {
     this.#pointPresenters.clear();
   }
 
+  #renderPoints() {
+    if (!this.#routePointListElement) {
+      return;
+    }
+
+    this.#clearPointPresenters();
+
+    const points = this.#getFilteredAndSortedPoints();
+
+    for (let i = 0; i < points.length; i++) {
+      this.#renderPoint(points[i]);
+    }
+  }
+
   #renderPoint(point) {
     const destination = this.#pointsModel.getDestinationById(point.destination);
     const offersByType = this.#pointsModel.getOffersByType(point.type);
@@ -261,8 +279,6 @@ export default class TripPresenter {
     this.#sortComponent.setSortChangeHandler();
     render(this.#routePointListElement, this.#tripEventsContainer);
 
-    for (let i = 0; i < points.length; i++) {
-      this.#renderPoint(points[i]);
-    }
+    this.#renderPoints();
   }
 }
