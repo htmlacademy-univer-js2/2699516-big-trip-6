@@ -1,13 +1,21 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { FilterMessage } from '../const.js';
 
-function createEmptyPointsTemplate() {
+function createEmptyPointsTemplate(filterType) {
   return `
-    <p class="trip-events__msg">Нужно добавить новое событие</p>
+    <p class="trip-events__msg">${FilterMessage[filterType]}</p>
   `;
 }
 
 export default class EmptyPointsView extends AbstractView {
+  #filterType = null;
+
+  constructor(filterType) {
+    super();
+    this.#filterType = filterType;
+  }
+
   get template() {
-    return createEmptyPointsTemplate();
+    return createEmptyPointsTemplate(this.#filterType);
   }
 }

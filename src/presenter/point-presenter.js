@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import Point from '../view/route-point-view.js';
 import CreateForm from '../view/form-edit-view.js';
+import { UserAction } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -39,8 +40,10 @@ export default class PointPresenter {
     this.#handleDataChange = onDataChange;
   }
 
-  init(point) {
+  init(point, destination = this.#destination, pointOffers = this.#pointOffers) {
     this.#point = point;
+    this.#destination = destination;
+    this.#pointOffers = pointOffers;
 
     const prevPointComponent = this.#pointComponent;
     const prevFormComponent = this.#pointFormComponent;
@@ -59,6 +62,7 @@ export default class PointPresenter {
     });
 
     this.#pointFormComponent = new CreateForm({
+      isEdit: true,
       point: this.#point,
       destination: this.#destination,
       offers: this.#allOffers,
@@ -74,14 +78,18 @@ export default class PointPresenter {
           destination: selectedDestination ? selectedDestination.id : this.#point.destination,
           offers: state.offers,
         };
-        this.#handleDataChange(updatedPoint);
+        this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
         this.#replaceFormToPoint();
         document.removeEventListener('keydown', this.#escKeyHandler);
       },
       onCancelClick: () => {
         this.#replaceFormToPoint();
         document.removeEventListener('keydown', this.#escKeyHandler);
-      }
+      },
+      onDeleteClick: () => {
+        this.#handleDataChange(UserAction.DELETE_POINT, this.#point);
+        document.removeEventListener('keydown', this.#escKeyHandler);
+      },
     });
 
     if (prevPointComponent === null) {
@@ -97,6 +105,14 @@ export default class PointPresenter {
 
     remove(prevPointComponent);
     remove(prevFormComponent);
+  }
+
+  destroy() {
+    this.resetView();
+    remove(this.#pointComponent);
+    remove(this.#pointFormComponent);
+    this.#pointComponent = null;
+    this.#pointFormComponent = null;
   }
 
   resetView() {
@@ -126,8 +142,8 @@ export default class PointPresenter {
   #handleFavoriteClick = () => {
     const updatedPoint = {
       ...this.#point,
-      is_favorite: !this.#point.is_favorite
+      'is_favorite': !this.#point.is_favorite
     };
-    this.#handleDataChange(updatedPoint);
+    this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
   };
 }
