@@ -79,20 +79,32 @@ export default class PointPresenter {
           offers: state.offers,
         };
 
+        this.#pointFormComponent.setSaving();
+
         try {
           await this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
           document.removeEventListener('keydown', this.#escKeyHandler);
         } catch {
-          // Ошибки запроса обработаем во второй части задания
+          this.#pointFormComponent.shake();
+        } finally {
+          this.#pointFormComponent.resetButtons();
         }
       },
       onCancelClick: () => {
         this.#replaceFormToPoint();
         document.removeEventListener('keydown', this.#escKeyHandler);
       },
-      onDeleteClick: () => {
-        this.#handleDataChange(UserAction.DELETE_POINT, this.#point);
-        document.removeEventListener('keydown', this.#escKeyHandler);
+      onDeleteClick: async () => {
+        this.#pointFormComponent.setDeleting();
+
+        try {
+          await this.#handleDataChange(UserAction.DELETE_POINT, this.#point);
+          document.removeEventListener('keydown', this.#escKeyHandler);
+        } catch {
+          this.#pointFormComponent.shake();
+        } finally {
+          this.#pointFormComponent.resetButtons();
+        }
       },
     });
 
@@ -152,7 +164,7 @@ export default class PointPresenter {
     try {
       await this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
     } catch {
-      // Ошибки запроса обработаем во второй части задания
+      // Избранное на карточке — форма не открыта, shake не требуется
     }
   };
 }

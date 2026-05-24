@@ -15,8 +15,7 @@ function adaptPointToClient(point) {
 }
 
 function adaptPointToServer(point) {
-  return {
-    id: point.id,
+  const adaptedPoint = {
     type: point.type,
     destination: point.destination,
     base_price: point.basePrice,
@@ -25,6 +24,12 @@ function adaptPointToServer(point) {
     is_favorite: point.is_favorite,
     offers: point.offers,
   };
+
+  if (point.id) {
+    adaptedPoint.id = point.id;
+  }
+
+  return adaptedPoint;
 }
 /* eslint-enable camelcase */
 
@@ -45,6 +50,19 @@ export default class TripApi extends ApiService {
       .then(ApiService.parseResponse);
   }
 
+  createPoint(point) {
+    const adaptedPoint = adaptPointToServer(point);
+
+    return this._load({
+      url: 'points',
+      method: 'POST',
+      body: JSON.stringify(adaptedPoint),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(ApiService.parseResponse)
+      .then(adaptPointToClient);
+  }
+
   updatePoint(point) {
     const adaptedPoint = adaptPointToServer(point);
 
@@ -56,5 +74,12 @@ export default class TripApi extends ApiService {
     })
       .then(ApiService.parseResponse)
       .then(adaptPointToClient);
+  }
+
+  deletePoint(pointId) {
+    return this._load({
+      url: `points/${pointId}`,
+      method: 'DELETE',
+    });
   }
 }

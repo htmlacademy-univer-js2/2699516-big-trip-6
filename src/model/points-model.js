@@ -77,12 +77,14 @@ export default class PointModel extends Observable {
     this._notify(updateType, updatedPoint);
   }
 
-  addPoint(updateType, point) {
-    this.#points.push(point);
+  async addPoint(updateType, point) {
+    const newPoint = await this.#tripApi.createPoint(point);
+    this.#points.push(newPoint);
     this._notify(updateType);
   }
 
-  deletePoint(updateType, pointId) {
+  async deletePoint(updateType, pointId) {
+    await this.#tripApi.deletePoint(pointId);
     this.#points = this.#points.filter((point) => point.id !== pointId);
     this._notify(updateType);
   }

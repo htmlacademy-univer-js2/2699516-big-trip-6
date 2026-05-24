@@ -5,7 +5,8 @@ import TripPresenter from './presenter/trip-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import TripApi from './api/trip-api.js';
 import LoadingView from './view/loading-view.js';
-import {END_POINT, AUTHORIZATION} from './const.js';
+import UiBlocker from './framework/ui-blocker/ui-blocker.js';
+import {END_POINT, AUTHORIZATION, TimeLimit} from './const.js';
 import {render, remove} from './framework/render.js';
 
 const siteMainElement = document.querySelector('.page-main');
@@ -18,6 +19,11 @@ const pointsModel = new PointModel({tripApi});
 const filterModel = new FilterModel();
 const sortModel = new SortModel();
 
+const uiBlocker = new UiBlocker({
+  lowerLimit: TimeLimit.LOWER_LIMIT,
+  upperLimit: TimeLimit.UPPER_LIMIT,
+});
+
 const filterPresenter = new FilterPresenter({
   container: filtersContainer,
   filterModel,
@@ -29,6 +35,7 @@ const tripPresenter = new TripPresenter({
   pointsModel,
   filterModel,
   sortModel,
+  uiBlocker,
 });
 
 const bootstrap = async () => {
