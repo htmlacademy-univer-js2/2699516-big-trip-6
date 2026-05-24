@@ -38,7 +38,7 @@ export default class NewPointPresenter {
         basePrice: 0,
         offers: [],
       },
-      onFormSubmit: (state) => {
+      onFormSubmit: async (state) => {
         const selectedDestination = this.#destinations.find((item) => item.name === state.destination);
 
         if (!selectedDestination) {
@@ -46,7 +46,6 @@ export default class NewPointPresenter {
         }
 
         const newPoint = {
-          id: crypto.randomUUID(),
           type: state.type,
           basePrice: Number(state.basePrice),
           dateFrom: state.dateFrom,
@@ -56,8 +55,16 @@ export default class NewPointPresenter {
           'is_favorite': false,
         };
 
-        this.#onDataChange(UserAction.ADD_POINT, newPoint);
-        document.removeEventListener('keydown', this.#escKeyHandler);
+        this.#formComponent.setSaving();
+
+        try {
+          await this.#onDataChange(UserAction.ADD_POINT, newPoint);
+          document.removeEventListener('keydown', this.#escKeyHandler);
+        } catch {
+          this.#formComponent.shake();
+        } finally {
+          this.#formComponent.resetButtons();
+        }
       },
       onCancelClick: () => {
         this.#onClose();

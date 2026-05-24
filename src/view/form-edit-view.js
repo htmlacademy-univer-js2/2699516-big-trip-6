@@ -3,6 +3,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { humanizeDateTime } from '../utils/date-format.js';
 import { escapeHTML } from '../utils/escape.js';
+import { ButtonText } from '../const.js';
 
 function createDestinationSection(state) {
   if (!state.description && (!state.pictures || state.pictures.length === 0)) {
@@ -29,8 +30,8 @@ function createDestinationSection(state) {
 function createFormButtons(isEdit) {
   if (isEdit) {
     return `
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="button">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit">${ButtonText.SAVE}</button>
+      <button class="event__reset-btn" type="button">${ButtonText.DELETE}</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Close event</span>
       </button>
@@ -38,7 +39,7 @@ function createFormButtons(isEdit) {
   }
 
   return `
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit">${ButtonText.SAVE}</button>
     <button class="event__reset-btn" type="button">Cancel</button>
   `;
 }
@@ -164,6 +165,42 @@ export default class CreateForm extends AbstractStatefulView {
 
   get template() {
     return createFormTemplate(this._state, this.#allOffers, this.#destinations, this.#isEdit);
+  }
+
+  setSaving() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+
+    if (saveButton) {
+      saveButton.textContent = ButtonText.SAVING;
+      saveButton.disabled = true;
+    }
+  }
+
+  setDeleting() {
+    const deleteButton = this.element.querySelector('.event__reset-btn');
+
+    if (deleteButton) {
+      deleteButton.textContent = ButtonText.DELETING;
+      deleteButton.disabled = true;
+    }
+  }
+
+  resetButtons() {
+    const saveButton = this.element.querySelector('.event__save-btn');
+
+    if (saveButton) {
+      saveButton.textContent = ButtonText.SAVE;
+      saveButton.disabled = false;
+    }
+
+    if (this.#isEdit) {
+      const deleteButton = this.element.querySelector('.event__reset-btn');
+
+      if (deleteButton) {
+        deleteButton.textContent = ButtonText.DELETE;
+        deleteButton.disabled = false;
+      }
+    }
   }
 
   removeElement() {
@@ -306,7 +343,7 @@ export default class CreateForm extends AbstractStatefulView {
     this._setState({ offers });
   };
 
-  #formSubmitHandler = (evt) => {
+  #formSubmitHandler = async (evt) => {
     evt.preventDefault();
 
     const selectedDestination = this.#destinations.find((item) => item.name === this._state.destination);
@@ -319,12 +356,12 @@ export default class CreateForm extends AbstractStatefulView {
       return;
     }
 
-    this.#onSubmit(this._state);
+    await this.#onSubmit(this._state);
   };
 
-  #deleteClickHandler = (evt) => {
+  #deleteClickHandler = async (evt) => {
     evt.preventDefault();
-    this.#onDeleteClick();
+    await this.#onDeleteClick();
   };
 
   #cancelClickHandler = (evt) => {

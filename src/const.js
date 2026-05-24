@@ -36,6 +36,18 @@ const UpdateType = {
 const END_POINT = 'https://21.objects.pages.academy/big-trip';
 const AUTHORIZATION = 'Basic k7m3p9x2w4n8q1v6';
 
+const ButtonText = {
+  SAVE: 'Save',
+  SAVING: 'Saving...',
+  DELETE: 'Delete',
+  DELETING: 'Deleting...',
+};
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 550,
+};
+
 export {
   FilterType,
   FilterMessage,
@@ -44,4 +56,6 @@ export {
   UpdateType,
   END_POINT,
   AUTHORIZATION,
+  ButtonText,
+  TimeLimit,
 };

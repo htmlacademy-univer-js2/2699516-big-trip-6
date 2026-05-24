@@ -22,13 +22,15 @@ export default class TripPresenter {
   #emptyComponent = null;
   #newEventButton = null;
   #shouldOpenNewPointForm = false;
+  #uiBlocker = null;
 
-  constructor({ container, pointsModel, filterModel, sortModel }) {
+  constructor({ container, pointsModel, filterModel, sortModel, uiBlocker }) {
     this.#tripEventsContainer = container.querySelector('.trip-events');
     this.#newEventButton = document.querySelector('.trip-main__event-add-btn');
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
     this.#sortModel = sortModel;
+    this.#uiBlocker = uiBlocker;
   }
 
   init() {
@@ -61,16 +63,22 @@ export default class TripPresenter {
   }
 
   #handleViewAction = async (actionType, payload) => {
-    switch (actionType) {
-      case UserAction.UPDATE_POINT:
-        await this.#pointsModel.updatePoint(UpdateType.MINOR, payload);
-        break;
-      case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(UpdateType.MAJOR, payload);
-        break;
-      case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(UpdateType.MAJOR, payload.id);
-        break;
+    this.#uiBlocker.block();
+
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
+          await this.#pointsModel.updatePoint(UpdateType.MINOR, payload);
+          break;
+        case UserAction.ADD_POINT:
+          await this.#pointsModel.addPoint(UpdateType.MAJOR, payload);
+          break;
+        case UserAction.DELETE_POINT:
+          await this.#pointsModel.deletePoint(UpdateType.MAJOR, payload.id);
+          break;
+      }
+    } finally {
+      this.#uiBlocker.unblock();
     }
   };
 
