@@ -1,18 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-
-function formatDateTime(dateString) {
-  if (!dateString) {
-    return '';
-  }
-  const date = new Date(dateString);
-  return date.toLocaleString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).replace(',', '');
-}
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import { humanizeDateTime } from '../utils/date-format.js';
 
 function createDestinationSection(state) {
   if (!state.description && (!state.pictures || state.pictures.length === 0)) {
@@ -77,11 +66,11 @@ function createFormTemplate(state, allOffers, destinations) {
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time" id="event-start-time-1" type="text"
-                 name="event-start-time" value="${formatDateTime(state.dateFrom)}">
+                 name="event-start-time" value="${humanizeDateTime(state.dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
           <input class="event__input  event__input--time" id="event-end-time-1" type="text"
-                 name="event-end-time" value="${formatDateTime(state.dateTo)}">
+                 name="event-end-time" value="${humanizeDateTime(state.dateTo)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -129,6 +118,8 @@ export default class CreateForm extends AbstractStatefulView {
   #destinations = null;
   #onSubmit = null;
   #onCancelClick = null;
+  #startDatepicker = null;
+  #endDatepicker = null;
 
   constructor({ point, destination, offers, destinations, onFormSubmit, onCancelClick }) {
     super();
@@ -153,6 +144,20 @@ export default class CreateForm extends AbstractStatefulView {
 
   get template() {
     return createFormTemplate(this._state, this.#allOffers, this.#destinations);
+  }
+
+  removeElement() {
+    if (this.#startDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#startDatepicker = null;
+    }
+
+    if (this.#endDatepicker) {
+      this.#endDatepicker.destroy();
+      this.#endDatepicker = null;
+    }
+
+    super.removeElement();
   }
 
   _restoreHandlers() {
@@ -185,7 +190,57 @@ export default class CreateForm extends AbstractStatefulView {
     if (offersSection) {
       offersSection.addEventListener('change', this.#offerChangeHandler);
     }
+
+    this.#setDatepicker();
   }
+
+  #setDatepicker() {
+    const startElement = this.element.querySelector('#event-start-time-1');
+    const endElement = this.element.querySelector('#event-end-time-1');
+
+    if (!startElement || !endElement) {
+      return;
+    }
+
+    this.#startDatepicker = flatpickr(startElement, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      defaultDate: this._state.dateFrom,
+      onChange: this.#startDateChangeHandler,
+    });
+
+    this.#endDatepicker = flatpickr(endElement, {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      defaultDate: this._state.dateTo,
+      minDate: this._state.dateFrom,
+      onChange: this.#endDateChangeHandler,
+    });
+  }
+
+  #startDateChangeHandler = ([selectedDate]) => {
+    if (!selectedDate) {
+      return;
+    }
+
+    this._setState({
+      dateFrom: selectedDate.toISOString(),
+    });
+
+    if (this.#endDatepicker) {
+      this.#endDatepicker.set('minDate', selectedDate);
+    }
+  };
+
+  #endDateChangeHandler = ([selectedDate]) => {
+    if (!selectedDate) {
+      return;
+    }
+
+    this._setState({
+      dateTo: selectedDate.toISOString(),
+    });
+  };
 
   #typeChangeHandler = (evt) => {
     this.updateElement({
