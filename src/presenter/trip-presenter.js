@@ -60,10 +60,10 @@ export default class TripPresenter {
     }));
   }
 
-  #handleViewAction = (actionType, payload) => {
+  #handleViewAction = async (actionType, payload) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(UpdateType.PATCH, payload);
+        await this.#pointsModel.updatePoint(UpdateType.MINOR, payload);
         break;
       case UserAction.ADD_POINT:
         this.#pointsModel.addPoint(UpdateType.MAJOR, payload);
@@ -74,15 +74,10 @@ export default class TripPresenter {
     }
   };
 
-  #handlePointsModelChange = (updateType, payload) => {
-    if (updateType === UpdateType.PATCH) {
-      const destination = this.#pointsModel.getDestinationById(payload.destination);
-      const offersByType = this.#pointsModel.getOffersByType(payload.type);
-      const pointOffers = offersByType
-        ? offersByType.offers.filter((offer) => payload.offers?.includes(offer.id))
-        : [];
-
-      this.#pointPresenters.get(payload.id)?.init(payload, destination, pointOffers);
+  #handlePointsModelChange = (updateType) => {
+    if (updateType === UpdateType.MINOR) {
+      this.#resetAllEditForms();
+      this.#renderBoard();
       return;
     }
 
