@@ -24,15 +24,16 @@ function createPointTemplate(point, destination, offers) {
   const dateFrom = new Date(point.dateFrom);
   const dateTo = new Date(point.dateTo);
 
-  const offersList = offers.map((offer) => `
+  // Проверка, что offers - массив
+  const offersList = Array.isArray(offers) && offers.length > 0 ? offers.map((offer) => `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
     </li>
-  `).join('');
-  const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
+  `).join('') : '';
 
+  const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
 
   return `
     <li class="trip-events__item">

@@ -30,13 +30,12 @@ export default class TripPresenter {
     this.#renderBoard();
   }
 
-  #handleModeChange = (currentPresenter) => {
-    this.#pointPresenters.forEach((pointPresenter) => {    
-      if (pointPresenter !== currentPresenter) {
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((pointPresenter) => {
       pointPresenter.resetView();
-    }
-  });
-};
+    });
+  };
+
   #handlePointDataChange = (updatedPoint) => {
     this.#pointsModel.updatePoint(updatedPoint);
     this.#pointsArray = [...this.#pointsModel.getPoints()];
@@ -51,9 +50,11 @@ export default class TripPresenter {
     ) : [];
 
     const pointPresenter = new PointPresenter(
-      pointOffers,
+      this.#pointsModel.getOffers(),
       destination,
+      pointOffers,
       this.#routePointListElement.element,
+      this.#pointsModel.getDestinations(),
       this.#handleModeChange,
       this.#handlePointDataChange
     );
@@ -61,6 +62,7 @@ export default class TripPresenter {
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
+
   #renderBoard() {
     if (this.#pointsArray.length > 0) {
       if (this.#tripControlFilters) {

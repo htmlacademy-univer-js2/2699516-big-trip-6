@@ -9,10 +9,11 @@ const Mode = {
 
 export default class PointPresenter {
   #point = null;
-  #offers = [];
+  #allOffers = null;
+  #pointOffers = [];
   #destination = null;
+  #destinations = null;
   #mode = Mode.DEFAULT;
-
   #pointComponent = null;
   #pointFormComponent = null;
   #pointsListComponent = null;
@@ -28,9 +29,11 @@ export default class PointPresenter {
     }
   };
 
-  constructor(offers, destination, pointsListComponent, onModeChange, onDataChange) {
-    this.#offers = offers;
+  constructor(allOffers, destination, pointOffers, pointsListComponent, destinations, onModeChange, onDataChange) {
+    this.#allOffers = allOffers;
     this.#destination = destination;
+    this.#pointOffers = pointOffers;
+    this.#destinations = destinations;
     this.#pointsListComponent = pointsListComponent;
     this.#handleModeChange = onModeChange;
     this.#handleDataChange = onDataChange;
@@ -38,13 +41,13 @@ export default class PointPresenter {
 
   init(point) {
     this.#point = point;
-  
+
     const prevPointComponent = this.#pointComponent;
     const prevFormComponent = this.#pointFormComponent;
-  
+
     this.#pointComponent = new Point({
       point: this.#point,
-      offers: this.#offers,
+      offers: this.#pointOffers,
       destination: this.#destination,
       onEditClick: () => {
         this.#replacePointToForm();
@@ -54,16 +57,22 @@ export default class PointPresenter {
         this.#handleFavoriteClick();
       }
     });
-  
+
     this.#pointFormComponent = new CreateForm({
       point: this.#point,
-      offers: this.#offers,
       destination: this.#destination,
-      onFormSubmit: () => {
-        const formData = this.#pointFormComponent.getFormData();
+      offers: this.#allOffers,
+      destinations: this.#destinations,
+      onFormSubmit: (state) => {
+        const selectedDestination = this.#destinations.find((item) => item.name === state.destination);
         const updatedPoint = {
           ...this.#point,
-          ...formData
+          type: state.type,
+          basePrice: Number(state.basePrice),
+          dateFrom: state.dateFrom,
+          dateTo: state.dateTo,
+          destination: selectedDestination ? selectedDestination.id : this.#point.destination,
+          offers: state.offers,
         };
         this.#handleDataChange(updatedPoint);
         this.#replaceFormToPoint();
@@ -74,37 +83,38 @@ export default class PointPresenter {
         document.removeEventListener('keydown', this.#escKeyHandler);
       }
     });
-  
-    // При первом запуске
+
     if (prevPointComponent === null) {
       render(this.#pointComponent, this.#pointsListComponent);
       return;
     }
-  
-    // При обновлении данных
+
     if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     } else {
       replace(this.#pointFormComponent, prevFormComponent);
     }
-  
+
     remove(prevPointComponent);
     remove(prevFormComponent);
   }
+
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
       this.#replaceFormToPoint();
+      document.removeEventListener('keydown', this.#escKeyHandler);
     }
   }
+
   #replacePointToForm() {
     if (this.#mode === Mode.EDITING) {
       return;
     }
+    this.#handleModeChange();
     replace(this.#pointFormComponent, this.#pointComponent);
-    this.#handleModeChange(this);
     this.#mode = Mode.EDITING;
   }
-  
+
   #replaceFormToPoint() {
     if (this.#mode === Mode.DEFAULT) {
       return;
