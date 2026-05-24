@@ -1,54 +1,33 @@
 import AbstractView from '../framework/view/abstract-view.js';
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
-}
-
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-}
-
-function formatDuration(dateFrom, dateTo) {
-  const duration = new Date(dateTo) - new Date(dateFrom);
-  const hours = Math.floor(duration / (1000 * 60 * 60));
-  const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours > 0) {
-    return `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
-  }
-  return `${minutes}M`;
-}
+import dayjs from 'dayjs';
+import { humanizeDate, humanizeTime, getDuration } from '../utils/date-format.js';
 
 function createPointTemplate(point, destination, offers) {
-  const dateFrom = new Date(point.dateFrom);
-  const dateTo = new Date(point.dateTo);
-
-  const offersList = offers.map((offer) => `
+  const offersList = Array.isArray(offers) && offers.length > 0 ? offers.map((offer) => `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
     </li>
-  `).join('');
-  const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
+  `).join('') : '';
 
+  const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
 
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom.toISOString().split('T')[0]}">${formatDate(point.dateFrom)}</time>
+        <time class="event__date" datetime="${dayjs(point.dateFrom).format('YYYY-MM-DD')}">${humanizeDate(point.dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${point.type} ${destination ? destination.name : ''}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom.toISOString()}">${formatTime(point.dateFrom)}</time>
+            <time class="event__start-time" datetime="${dayjs(point.dateFrom).format()}">${humanizeTime(point.dateFrom)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo.toISOString()}">${formatTime(point.dateTo)}</time>
+            <time class="event__end-time" datetime="${dayjs(point.dateTo).format()}">${humanizeTime(point.dateTo)}</time>
           </p>
-          <p class="event__duration">${formatDuration(point.dateFrom, point.dateTo)}</p>
+          <p class="event__duration">${getDuration(point.dateFrom, point.dateTo)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${point.basePrice}</span>
@@ -89,7 +68,6 @@ export default class Point extends AbstractView {
     this.#onEditClick = onEditClick;
     this.#onFavoriteClick = onFavoriteClick;
 
-    
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editHandlerClick);
     this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteHandlerClick);
   }
@@ -97,6 +75,7 @@ export default class Point extends AbstractView {
   get template() {
     return createPointTemplate(this.#point, this.#destination, this.#offers);
   }
+
   #editHandlerClick = (evt) => {
     evt.preventDefault();
     this.#onEditClick();
