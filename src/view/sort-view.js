@@ -12,7 +12,7 @@ function createSortTemplate(sorts) {
                  value="${sort.type}"
                  ${sort.isChecked ? 'checked' : ''}
                  ${sort.isDisabled ? 'disabled' : ''}>
-          <label class="trip-sort__btn" for="sort-${sort.type}">${sort.name}</label>
+          <label class="trip-sort__btn" data-sort-type="${sort.type}" for="sort-${sort.type}">${sort.name}</label>
         </div>
       `).join('')}
     </form>
@@ -34,12 +34,23 @@ export default class Sort extends AbstractView {
   }
 
   setSortChangeHandler() {
-    this.element.addEventListener('change', this.#sortChangeHandler);
+    this.element.addEventListener('click', this.#sortClickHandler);
   }
 
-  #sortChangeHandler = (evt) => {
-    if (evt.target.classList.contains('trip-sort__input')) {
-      this.#onSortChange(evt.target.value);
+  #sortClickHandler = (evt) => {
+    const sortButton = evt.target.closest('[data-sort-type]');
+
+    if (!sortButton) {
+      return;
     }
+
+    const sortType = sortButton.dataset.sortType;
+    const sortInput = this.element.querySelector(`#sort-${sortType}`);
+
+    if (!sortInput || sortInput.disabled) {
+      return;
+    }
+
+    this.#onSortChange(sortType);
   };
 }

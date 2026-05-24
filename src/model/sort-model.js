@@ -9,6 +9,10 @@ export default class SortModel extends Observable {
   }
 
   setSortType(updateType, sortType) {
+    if (this.#sortType === sortType) {
+      return;
+    }
+
     this.#sortType = sortType;
     this._notify(updateType, sortType);
   }
