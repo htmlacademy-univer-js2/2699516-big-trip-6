@@ -12,6 +12,10 @@ const FilterMessage = {
   [FilterType.PAST]: 'There are no past events now',
 };
 
+const LoadMessage = {
+  FAILED: 'Failed to load latest route information',
+};
+
 const SortType = {
   DAY: 'day',
   EVENT: 'event',
@@ -33,8 +37,7 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-const END_POINT = 'https://21.objects.pages.academy/big-trip';
-const AUTHORIZATION = 'Basic k7m3p9x2w4n8q1v6';
+const END_POINT = 'https://24.objects.htmlacademy.pro/big-trip';
 
 const ButtonText = {
   SAVE: 'Save',
@@ -51,11 +54,11 @@ const TimeLimit = {
 export {
   FilterType,
   FilterMessage,
+  LoadMessage,
   SortType,
   UserAction,
   UpdateType,
   END_POINT,
-  AUTHORIZATION,
   ButtonText,
   TimeLimit,
 };

@@ -164,7 +164,7 @@ export default class PointPresenter {
     try {
       await this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
     } catch {
-      // Избранное на карточке — форма не открыта, shake не требуется
+      this.#pointComponent.shake();
     }
   };
 }

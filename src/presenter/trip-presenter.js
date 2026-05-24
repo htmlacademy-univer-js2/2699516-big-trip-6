@@ -8,7 +8,7 @@ import { render, remove } from '../framework/render.js';
 import { sorts } from '../mock/sort.js';
 import { filterPointsByType } from '../utils/filter.js';
 import { sortPoints } from '../utils/sort.js';
-import { UserAction, UpdateType, FilterType } from '../const.js';
+import { UserAction, UpdateType, FilterType, LoadMessage } from '../const.js';
 
 export default class TripPresenter {
   #tripEventsContainer = null;
@@ -237,6 +237,20 @@ export default class TripPresenter {
   #renderBoard() {
     this.#clearBoard();
 
+    if (this.#pointsModel.hasLoadError()) {
+      if (this.#newEventButton) {
+        this.#newEventButton.disabled = true;
+      }
+
+      this.#emptyComponent = new EmptyPointsView(LoadMessage.FAILED);
+      render(this.#emptyComponent, this.#tripEventsContainer);
+      return;
+    }
+
+    if (this.#newEventButton) {
+      this.#newEventButton.disabled = false;
+    }
+
     const allPoints = this.#pointsModel.getPoints();
     const points = this.#getFilteredAndSortedPoints();
 
@@ -245,7 +259,7 @@ export default class TripPresenter {
         ? FilterType.EVERYTHING
         : this.#filterModel.getFilter();
 
-      this.#emptyComponent = new EmptyPointsView(filterType);
+      this.#emptyComponent = EmptyPointsView.createFromFilter(filterType);
       render(this.#emptyComponent, this.#tripEventsContainer);
       return;
     }
