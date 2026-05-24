@@ -185,6 +185,8 @@ export default class TripPresenter {
     if (this.#newEventButton) {
       this.#newEventButton.disabled = false;
     }
+
+    this.#renderBoard();
   }
 
   #clearBoard() {
