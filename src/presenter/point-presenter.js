@@ -67,7 +67,7 @@ export default class PointPresenter {
       destination: this.#destination,
       offers: this.#allOffers,
       destinations: this.#destinations,
-      onFormSubmit: (state) => {
+      onFormSubmit: async (state) => {
         const selectedDestination = this.#destinations.find((item) => item.name === state.destination);
         const updatedPoint = {
           ...this.#point,
@@ -78,9 +78,13 @@ export default class PointPresenter {
           destination: selectedDestination ? selectedDestination.id : this.#point.destination,
           offers: state.offers,
         };
-        this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
-        this.#replaceFormToPoint();
-        document.removeEventListener('keydown', this.#escKeyHandler);
+
+        try {
+          await this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
+          document.removeEventListener('keydown', this.#escKeyHandler);
+        } catch {
+          // Ошибки запроса обработаем во второй части задания
+        }
       },
       onCancelClick: () => {
         this.#replaceFormToPoint();
@@ -139,11 +143,16 @@ export default class PointPresenter {
     this.#mode = Mode.DEFAULT;
   }
 
-  #handleFavoriteClick = () => {
+  #handleFavoriteClick = async () => {
     const updatedPoint = {
       ...this.#point,
       'is_favorite': !this.#point.is_favorite
     };
-    this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
+
+    try {
+      await this.#handleDataChange(UserAction.UPDATE_POINT, updatedPoint);
+    } catch {
+      // Ошибки запроса обработаем во второй части задания
+    }
   };
 }

@@ -33,10 +33,15 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
+const END_POINT = 'https://21.objects.pages.academy/big-trip';
+const AUTHORIZATION = 'Basic k7m3p9x2w4n8q1v6';
+
 export {
   FilterType,
   FilterMessage,
   SortType,
   UserAction,
   UpdateType,
+  END_POINT,
+  AUTHORIZATION,
 };

@@ -1,12 +1,35 @@
-import { getInitialPoints } from '../mock/point.js';
-import { mockOffer } from '../mock/offer.js';
-import { mockDestination } from '../mock/destination.js';
 import Observable from '../framework/observable.js';
 
 export default class PointModel extends Observable {
-  #points = getInitialPoints();
-  #destinations = mockDestination;
-  #offers = mockOffer;
+  #tripApi = null;
+  #points = [];
+  #destinations = [];
+  #offers = [];
+
+  constructor({tripApi}) {
+    super();
+    this.#tripApi = tripApi;
+  }
+
+  async init() {
+    try {
+      this.#points = await this.#tripApi.getPoints();
+    } catch {
+      this.#points = [];
+    }
+
+    try {
+      this.#destinations = await this.#tripApi.getDestinations();
+    } catch {
+      this.#destinations = [];
+    }
+
+    try {
+      this.#offers = await this.#tripApi.getOffers();
+    } catch {
+      this.#offers = [];
+    }
+  }
 
   getPoints() {
     return [...this.#points];
@@ -42,17 +65,16 @@ export default class PointModel extends Observable {
     return offersType.offers.filter((item) => itemsId?.includes(item.id));
   }
 
-  updatePoint(updateType, updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
+  async updatePoint(updateType, point) {
+    const updatedPoint = await this.#tripApi.updatePoint(point);
+    const index = this.#points.findIndex((item) => item.id === updatedPoint.id);
 
     if (index === -1) {
-      return false;
+      throw new Error('Can\'t update unexisting point');
     }
 
-    this.#points[index] = { ...this.#points[index], ...updatedPoint };
+    this.#points[index] = updatedPoint;
     this._notify(updateType, updatedPoint);
-
-    return true;
   }
 
   addPoint(updateType, point) {
