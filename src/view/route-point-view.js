@@ -1,17 +1,19 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import { humanizeDate, humanizeTime, getDuration } from '../utils/date-format.js';
+import { escapeHTML } from '../utils/escape.js';
 
 function createPointTemplate(point, destination, offers) {
   const offersList = Array.isArray(offers) && offers.length > 0 ? offers.map((offer) => `
     <li class="event__offer">
-      <span class="event__offer-title">${offer.title}</span>
+      <span class="event__offer-title">${escapeHTML(offer.title)}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
     </li>
   `).join('') : '';
 
   const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
+  const destinationName = destination ? escapeHTML(destination.name) : '';
 
   return `
     <li class="trip-events__item">
@@ -20,7 +22,7 @@ function createPointTemplate(point, destination, offers) {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${point.type} ${destination ? destination.name : ''}</h3>
+        <h3 class="event__title">${point.type} ${destinationName}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${dayjs(point.dateFrom).format()}">${humanizeTime(point.dateFrom)}</time>

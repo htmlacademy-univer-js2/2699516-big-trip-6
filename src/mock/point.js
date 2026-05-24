@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const mockPoint = [
   {
     'id': '70f99a70-fe6f-47e2-90de-39285a411729',
@@ -64,3 +66,24 @@ export const mockPoint = [
 export const getRandomArrayElement = (array) => array[Math.floor(Math.random() * array.length)];
 
 export const getRandomPoint = () => getRandomArrayElement(mockPoint);
+
+function createPointFromTemplate(template, dateFrom, dateTo) {
+  return {
+    ...template,
+    dateFrom: dateFrom.toISOString(),
+    dateTo: dateTo.toISOString(),
+  };
+}
+
+function getInitialPoints() {
+  const now = dayjs();
+
+  return [
+    createPointFromTemplate(mockPoint[0], now.subtract(5, 'day'), now.subtract(3, 'day')),
+    createPointFromTemplate(mockPoint[1], now.subtract(1, 'hour'), now.add(2, 'hour')),
+    createPointFromTemplate(mockPoint[2], now.add(3, 'day'), now.add(5, 'day')),
+    createPointFromTemplate(mockPoint[3], now.add(10, 'day'), now.add(12, 'day')),
+  ];
+}
+
+export { getInitialPoints };
