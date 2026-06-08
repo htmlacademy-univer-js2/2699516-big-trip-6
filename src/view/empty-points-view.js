@@ -1,21 +1,25 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { FilterMessage } from '../const.js';
 
-function createEmptyPointsTemplate(filterType) {
+function createEmptyPointsTemplate(message) {
   return `
-    <p class="trip-events__msg">${FilterMessage[filterType]}</p>
+    <p class="trip-events__msg">${message}</p>
   `;
 }
 
 export default class EmptyPointsView extends AbstractView {
-  #filterType = null;
+  #message = '';
 
-  constructor(filterType) {
+  constructor(message) {
     super();
-    this.#filterType = filterType;
+    this.#message = message;
   }
 
   get template() {
-    return createEmptyPointsTemplate(this.#filterType);
+    return createEmptyPointsTemplate(this.#message);
+  }
+
+  static createFromFilter(filterType) {
+    return new EmptyPointsView(FilterMessage[filterType]);
   }
 }

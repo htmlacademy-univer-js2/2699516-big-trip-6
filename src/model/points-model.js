@@ -5,10 +5,15 @@ export default class PointModel extends Observable {
   #points = [];
   #destinations = [];
   #offers = [];
+  #hasLoadError = false;
 
   constructor({tripApi}) {
     super();
     this.#tripApi = tripApi;
+  }
+
+  hasLoadError() {
+    return this.#hasLoadError;
   }
 
   async init() {
@@ -16,6 +21,7 @@ export default class PointModel extends Observable {
       this.#points = await this.#tripApi.getPoints();
     } catch {
       this.#points = [];
+      this.#hasLoadError = true;
     }
 
     try {

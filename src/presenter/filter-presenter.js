@@ -26,6 +26,14 @@ export default class FilterPresenter {
     const currentFilter = this.#filterModel.getFilter();
     const points = this.#pointsModel.getPoints();
 
+    if (this.#pointsModel.hasLoadError()) {
+      return filters.map((filter) => ({
+        ...filter,
+        isChecked: filter.type === FilterType.EVERYTHING,
+        isDisabled: true,
+      }));
+    }
+
     return filters.map((filter) => ({
       ...filter,
       isChecked: filter.type === currentFilter,
