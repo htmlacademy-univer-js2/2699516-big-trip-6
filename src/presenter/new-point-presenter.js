@@ -52,7 +52,7 @@ export default class NewPointPresenter {
           dateTo: state.dateTo,
           destination: selectedDestination.id,
           offers: state.offers,
-          'is_favorite': false,
+          is_favorite: false,
         };
 
         this.#formComponent.setSaving();

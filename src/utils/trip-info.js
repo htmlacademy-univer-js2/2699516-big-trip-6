@@ -1,5 +1,8 @@
 import dayjs from 'dayjs';
 
+const MAX_VISIBLE_DESTINATIONS = 3;
+
+
 function getDestinationNames(points, pointsModel) {
   const sortedPoints = [...points].sort((firstPoint, secondPoint) =>
     dayjs(firstPoint.dateFrom).diff(dayjs(secondPoint.dateFrom))
@@ -17,7 +20,7 @@ function getTripTitle(points, pointsModel) {
     return '';
   }
 
-  if (destinationNames.length <= 3) {
+  if (destinationNames.length <= MAX_VISIBLE_DESTINATIONS) {
     return destinationNames.join(' — ');
   }
 
