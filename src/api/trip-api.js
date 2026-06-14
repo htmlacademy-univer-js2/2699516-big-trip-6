@@ -9,7 +9,7 @@ function adaptPointToClient(point) {
     basePrice: point.base_price,
     dateFrom: point.date_from,
     dateTo: point.date_to,
-    is_favorite: point.is_favorite,
+    isFavorite: point.isFavorite,
     offers: point.offers,
   };
 }
@@ -21,7 +21,7 @@ function adaptPointToServer(point) {
     base_price: point.basePrice,
     date_from: point.dateFrom,
     date_to: point.dateTo,
-    is_favorite: point.is_favorite,
+    isFavorite: point.isFavorite,
     offers: point.offers,
   };
 

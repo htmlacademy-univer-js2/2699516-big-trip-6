@@ -98,7 +98,7 @@ export default class PointPresenter {
         this.#pointFormComponent.setDeleting();
 
         try {
-          await this.#handleDataChange(UserAction.DELETE_POINT, this.#point);
+          await this.#handleDataChange(UserAction.DELETE_POINT, this.#point.id);
           document.removeEventListener('keydown', this.#escKeyHandler);
         } catch {
           this.#pointFormComponent.shake();
@@ -158,7 +158,7 @@ export default class PointPresenter {
   #handleFavoriteClick = async () => {
     const updatedPoint = {
       ...this.#point,
-      'is_favorite': !this.#point.is_favorite
+      isFavorite: !this.#point.isFavorite
     };
 
     try {
