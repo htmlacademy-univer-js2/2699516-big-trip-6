@@ -158,7 +158,7 @@ export default class PointPresenter {
   #handleFavoriteClick = async () => {
     const updatedPoint = {
       ...this.#point,
-      is_favorite: !this.#point.is_favorite
+      isFavorite: !this.#point.isFavorite
     };
 
     try {

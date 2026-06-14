@@ -12,7 +12,7 @@ function createPointTemplate(point, destination, offers) {
     </li>
   `).join('') : '';
 
-  const favoriteClass = point.is_favorite ? 'event__favorite-btn--active' : '';
+  const favoriteClass = point.isFavorite ? 'event__favorite-btn--active' : '';
   const destinationName = destination ? escapeHTML(destination.name) : '';
 
   return `
